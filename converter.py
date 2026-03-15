@@ -2,7 +2,7 @@ import os
 import sys
 from ebooklib import epub
 from bs4 import BeautifulSoup
-import imghdr
+from PIL import Image
 import re
 import shutil
 import argparse
@@ -217,8 +217,8 @@ def convert_to_epub(html_directory):
             img_src = img_tag['src']
             img_path = os.path.join(image_dir, img_src)
             img_filename = (os.path.basename(img_path))
-            img_media_type = imghdr.what(img_path)
-            img_media_type = 'jpeg' if img_media_type == 'jpg' else img_media_type
+            with Image.open(img_path) as img:
+                img_media_type = img.format.lower() # gibt 'jpeg', 'png' etc zurück
 
             # Add image to the EPUB resources
             img_id = img_src.replace('/', '_').replace('.', '_')

@@ -85,7 +85,7 @@ class MyFrame2(wx.Frame):
         if re.match(r'https?://', url_or_path):
         #Check Internet Connection
             try:
-                response = requests.get("https://www.projekt-gutenberg.org", timeout=5)
+                response = requests.get("https://projekt-gutenberg.org", timeout=5)
                 response.raise_for_status()  # Raise an exception for HTTP errors
             except requests.exceptions.RequestException as e:
                 show_error_message("Keine Internetverbindung! Bitte stellen Sie sicher, dass Sie mit dem Internet verbunden sind.", "Error")
@@ -97,7 +97,7 @@ class MyFrame2(wx.Frame):
                 return
             
             # Validate the URL pattern
-            valid_url_pattern = r'https://www\.projekt-gutenberg\.org/.+/.+/'
+            valid_url_pattern = r'https://(www\.)?projekt-gutenberg\.org/.+/.+/'
             if not re.match(valid_url_pattern, url_or_path):
                 show_error_message("Ungültiges URL-Format! Bitte geben Sie eine gültige Gutenberg-de-URL ein.", "Error")
                 self.m_button1.Enable()

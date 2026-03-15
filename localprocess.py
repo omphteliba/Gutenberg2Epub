@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import requests
 from bs4 import BeautifulSoup
@@ -23,17 +24,10 @@ def create_output_directory(output_dir, author_name, book_title):
     return output_directory
 
 def download_and_save_css(css_link, file_path, css_directory):
-    css_url = urljoin(file_path, css_link['href'])
-    css_filename = os.path.join(css_directory, os.path.basename(css_url))
-    
-    # Check if css_link has a string attribute and it's not None
-    if css_link.string is not None:
-        with open(css_filename, 'w', encoding='utf-8') as css_file:
-            css_file.write(css_link.string)
-        css_link['href'] = os.path.join('css', os.path.basename(css_url))
-    else:
-        #print("No content found in the CSS link:", css_link['href'])
-        pass
+    # Hier nutzen wir den lokalen Dateipfad statt einer URL
+    source_css = os.path.normpath(os.path.join(file_path, css_link['href']))
+    if os.path.exists(source_css):
+        shutil.copy(source_css, css_directory) # Einfach rüberkopieren!
 
 def remove_unwanted_elements(soup):
     classes_to_remove = ['dropdown', 'main-nav', 'mainnav', 'top', 'center', 'bottomnavi-gb']
@@ -72,25 +66,29 @@ def find_and_process_chapters(file_path, output_directory, author_name, book_tit
             chapter_css_link['href'] = os.path.join('css', os.path.basename(chapter_css_link['href']))
 
         
-        # Find and download images
+        # Find and copy local images
         img_tags = chapter_soup.find_all('img', src=True)
         for img_tag in img_tags:
-            img_src = urljoin(file_path, img_tag['src'])
-            img_name = os.path.basename(img_src)
-            img_src = os.path.join(file_path, img_src)
-            img_path = os.path.join(images_directory, img_name)
-            # Download and save the image
-            try:
-                with open(img_path, 'wb') as img_file:
-                    with open(img_src, 'rb') as img_src_file:
-                        img_file.write(img_src_file.read())
+            # 1. Den echten Quellpfad auf dem NAS berechnen
+            # os.path.normpath löst die "../../" Sprünge korrekt auf!
+            img_src_rel = img_tag['src']
+            img_source_path = os.path.normpath(os.path.join(file_path, img_src_rel))
+            
+            img_name = os.path.basename(img_source_path)
+            img_dest_path = os.path.join(images_directory, img_name)
 
-                # Replace the image src with the local path
+            try:
+                # 2. Kopieren statt Downloaden
+                import shutil
+                shutil.copy(img_source_path, img_dest_path)
+
+                # 3. Den Pfad im HTML auf den lokalen temp-Ordner umbiegen
                 img_tag['src'] = os.path.join('images', img_name)
-                pass
+                
             except FileNotFoundError:
-                #print("Error during image proceesing")
-                pass
+                print(f"Warnung: Bild nicht gefunden: {img_source_path}")
+            except Exception as e:
+                print(f"Fehler beim Kopieren von {img_name}: {e}")
         # Remove unwanted <h5> elements
         for h5 in chapter_soup.find_all('h5'):
             if author_name in h5.get_text() or book_title in h5.get_text():
@@ -152,7 +150,6 @@ def find_and_process_chapters(file_path, output_directory, author_name, book_tit
             chapter_filename = os.path.join(output_directory, chapter_link['href'])
             with open(chapter_filename, 'w', encoding='utf-8') as chapter_file:
                 chapter_file.write(str(chapter_soup.prettify()))
-
 
 def main():
     args = get_arguments()

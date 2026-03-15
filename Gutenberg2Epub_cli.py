@@ -6,7 +6,7 @@ import sys
 
 def validate_url(url):
     # Validate the URL pattern
-    valid_url_pattern = r'https://www\.projekt-gutenberg\.org/.+/.+/'
+    valid_url_pattern = r'https://(www\.)projekt-gutenberg\.org/.+/.+/'
     if not re.match(valid_url_pattern, url):
         raise ValueError("Ungültiges URL-Format! Bitte geben Sie eine gültige Gutenberg-de-URL ein.")
 
