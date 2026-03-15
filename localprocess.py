@@ -174,7 +174,8 @@ def main():
     find_and_modify_unwanted_links(soup)
     save_html_content_to_file(soup, output_directory)
     find_and_process_chapters(file_path, output_directory, author_name, book_title, soup)
-    print(output_directory)
+    # Das hier ist NEU: Damit das Batch-Skript weiß, wo das Buch liegt
+    print(f"TEMP_PATH:{output_directory}")
      
 
 if __name__ == "__main__":

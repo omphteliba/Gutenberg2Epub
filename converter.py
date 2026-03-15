@@ -396,11 +396,19 @@ def convert_to_epub(html_directory):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convertrt html to epub")
     parser.add_argument("--addcover", help="Path to cover image")
-    parser.add_argument("-d", "--output-dir", default="output", help="Directory to save the output")
+    # -d ist hier der Pfad zum TEMP-Ordner des Buches
+    parser.add_argument("-d", "--output-dir", required=True, help="Directory containing the temp HTML files")
     parser.add_argument("--deletedecover", type=lambda x: x.lower() == 'true', default=False, help="Remove cover image from the titelpage.")
     parser.add_argument("--remove-css", "--css", type=lambda y: y.lower() == 'true' , default=False, help="Exclude CSS file in the EPUB.")
     parser.add_argument("--popup-footnotes", type=lambda x: x.lower() == 'true', default=True, help="Convert footnotes to popup footnotes.")
+    
     args = parser.parse_args()
         
+    # Wir nehmen den Pfad direkt aus dem Argument -d
     html_directory = args.output_dir
-    convert_to_epub(html_directory)
+    
+    # Sicherheitscheck: Existiert der Ordner überhaupt?
+    if os.path.exists(html_directory):
+        convert_to_epub(html_directory)
+    else:
+        print(f"Fehler: Das Verzeichnis '{html_directory}' wurde nicht gefunden.")

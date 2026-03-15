@@ -57,6 +57,24 @@ python Gutenberg2Epub_cli.py https://www.projekt-gutenberg.org/autor/buch/ -o /h
 ```
 
 Die CLI ermöglicht es dir, das Konvertieren von Project Gutenberg-Büchern bequem über die Kommandozeile durchzuführen, und bietet die Flexibilität, Titelseitenbilder hinzuzufügen oder zu entfernen. Beachte, dass du Python auf deinem Computer installiert haben musst, um diesen Befehl auszuführen.
+
+Batch-Konvertierung (Massenverarbeitung)
+Wenn du eine lokale Offline-Kopie von Projekt Gutenberg (z. B. auf einem NAS) besitzt, kannst du den Batch-Prozess nutzen. Dieser scannt automatisch alle Unterverzeichnisse nach Büchern und konvertiert sie nacheinander.
+
+Verwendung:
+Bash
+python batch_convert.py <Quellverzeichnis> -d <Ausgabeverzeichnis>
+<Quellverzeichnis>: Der Pfad zu deiner Sammlung (z. B. \\TRUENAS\media\books). Das Skript sucht rekursiv nach allen Ordnern, die eine index.html enthalten.
+
+-d, --output: Das Verzeichnis, in dem die fertigen ePubs gespeichert werden sollen.
+
+Besonderheiten beim Batch-Prozess:
+Automatische Ressourcensuche: Das Skript findet und kopiert Bilder und CSS-Dateien automatisch aus den übergeordneten Verzeichnissen deiner lokalen Struktur.
+
+Fehlertoleranz: Sollte eine Konvertierung fehlschlagen (z. B. wegen Sonderzeichen), wird eine Fehlermeldung ausgegeben, aber das Skript macht automatisch mit dem nächsten Buch weiter.
+
+Windows-Optimierung: Verwendet spezielle Zeichenkodierung (latin-1), damit Pfade mit Umlauten (ä, ö, ü) unter Windows nicht zum Absturz führen.
+
 ## Installation und Anforderungen
 
 Falls du die ausführbare Datei nicht verwenden möchtest, besteht die Möglichkeit, die Python-Skripte zu verwenden. Zur Ausführung der Python-Skripte benötigst du die folgenden Abhängigkeiten:
